@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopVerse | Premium Store</title>
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --accent: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --bg-light: #f8fafc;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            --hover-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            --font-main: 'Inter', sans-serif;
+            --font-heading: 'Playfair Display', serif;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-light);
+            color: var(--primary);
+            padding-top: 80px;
+            overflow-x: hidden;
+        }
+
+        /* --- UI Components --- */
+        .navbar {
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid #e2e8f0;
+            padding: 1rem 0;
+        }
+        
+        .navbar-brand {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            font-size: 1.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-icon-btn {
+            width: 45px; height: 45px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: 0.2s; color: var(--primary);
+            text-decoration: none;
+            background: white;
+            border: 1px solid #e2e8f0;
+        }
+        .nav-icon-btn:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
+
+        .badge-count {
+            position: absolute; top: -5px; right: -5px;
+            width: 20px; height: 20px;
+            background: var(--danger); color: white;
+            font-size: 11px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            border: 2px solid white;
+        }
+
+        /* --- Product Card --- */
+        .product-card {
+            background: white; border-radius: 16px; border: 1px solid #e2e8f0;
+            transition: all 0.4s ease; overflow: hidden; height: 100%;
+            position: relative;
+        }
+        .product-card:hover { transform: translateY(-8px); box-shadow: var(--hover-shadow); border-color: var(--accent); }
+        
+        .card-img-wrapper { height: 260px; overflow: hidden; position: relative; background: #f1f5f9; }
+        .card-img-wrapper img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .product-card:hover img { transform: scale(1.1); }
+
+        .card-actions {
+            position: absolute; bottom: 15px; left: 0; right: 0;
+            display: flex; justify-content: center; gap: 10px;
+            opacity: 0; transform: translateY(20px); transition: 0.3s;
+        }
+        .product-card:hover .card-actions { opacity: 1; transform: translateY(0); }
+
+        .action-btn {
+            width: 40px; height: 40px; border-radius: 50%;
+            background: white; color: var(--primary);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15); cursor: pointer; transition: 0.2s;
+        }
+        .action-btn:hover { background: var(--primary); color: white; }
+        .action-btn.active { color: var(--danger); }
+
+        /* --- Hero --- */
+        .hero-carousel { border-radius: 0 0 40px 40px; overflow: hidden; margin-top: -20px; box-shadow: var(--card-shadow); }
+        .carousel-item { height: 550px; }
+        .carousel-item img { height: 100%; object-fit: cover; filter: brightness(0.75); }
+        .hero-caption { bottom: 25%; left: 10%; text-align: left; }
+        .hero-title { font-family: var(--font-heading); font-size: 4rem; font-weight: 700; line-height: 1.1; }
+
+        /* --- Filters --- */
+        .cat-scroll { display: flex; gap: 12px; overflow-x: auto; padding: 10px 0; scrollbar-width: none; }
+        .cat-btn {
+            padding: 8px 24px; border-radius: 50px; background: white;
+            border: 1px solid #e2e8f0; color: var(--primary);
+            font-weight: 500; white-space: nowrap; transition: 0.3s;
+        }
+        .cat-btn.active, .cat-btn:hover { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* --- Order History & Profile --- */
+        .sidebar-menu .nav-link {
+            color: var(--primary); padding: 12px 15px; border-radius: 8px; margin-bottom: 5px;
+            display: flex; align-items: center; gap: 10px; transition: 0.2s;
+        }
+        .sidebar-menu .nav-link:hover, .sidebar-menu .nav-link.active {
+            background: #f1f5f9; color: var(--accent); font-weight: 600;
+        }
+        
+        .order-card { border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 15px; overflow: hidden; transition: 0.2s; }
+        .order-card:hover { border-color: var(--accent); }
+        .order-header { background: #f8fafc; padding: 12px 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; }
+        .order-items-scroll { display: flex; gap: 10px; overflow-x: auto; padding: 15px 20px; }
+        .order-thumb { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #e2e8f0; }
+
+        /* --- Checkout Wizard --- */
+        .step-indicator { display: flex; justify-content: space-between; position: relative; margin-bottom: 30px; padding: 0 20px; }
+        .step-indicator::before { content: ''; position: absolute; top: 15px; left: 30px; right: 30px; height: 2px; background: #e2e8f0; z-index: 0; }
+        .step { position: relative; z-index: 1; text-align: center; background: white; padding: 0 10px; }
+        .step-circle { width: 32px; height: 32px; background: #e2e8f0; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: 600; margin: 0 auto 5px; transition: 0.3s; color: #64748b; }
+        .step.active .step-circle { background: var(--accent); color: white; box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2); }
+        .step.completed .step-circle { background: var(--success); color: white; }
+
+        /* --- Utilities --- */
+        .btn-primary-custom { background: var(--primary); color: white; padding: 10px 25px; border-radius: 50px; border: none; font-weight: 600; transition: 0.3s; }
+        .btn-primary-custom:hover { background: #334155; transform: translateY(-2px); }
+        
+        .toast-container { z-index: 1090; }
+        
+        /* Mobile */
+        @media (max-width: 768px) {
+            .hero-title { font-size: 2.5rem; }
+            .carousel-item { height: 450px; }
+            .card-actions { opacity: 1; transform: translateY(0); bottom: 10px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3"></div>
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container">
+            <button class="navbar-toggler border-0" type="button" data-bs-toggle="offcanvas" data-bs-target="#mobileMenu">
+                <i class="bi bi-list fs-2"></i>
+            </button>
+            
+            <a class="navbar-brand mx-auto mx-lg-0" href="#">ShopVerse.</a>
+
+            <div class="d-flex align-items-center gap-3 order-lg-3">
+                <a href="#" class="nav-icon-btn d-none d-md-flex" onclick="new bootstrap.Modal('#searchModal').show()">
+                    <i class="bi bi-search"></i>
+                </a>
+                <a href="#" class="nav-icon-btn" id="profileBtn" onclick="handleProfileClick()">
+                    <i class="bi bi-person"></i>
+                </a>
+                <a href="#" class="nav-icon-btn position-relative" data-bs-toggle="offcanvas" data-bs-target="#cartOffcanvas">
+                    <i class="bi bi-bag"></i>
+                    <span class="badge-count" id="cartCount">0</span>
+                </a>
+            </div>
+
+            <div class="collapse navbar-collapse justify-content-center">
+                <ul class="navbar-nav gap-4">
+                    <li class="nav-item"><a class="nav-link fw-medium" href="#" onclick="filterProducts('all')">New In</a></li>
+                    <li class="nav-item"><a class="nav-link fw-medium" href="#" onclick="filterProducts('fashion')">Fashion</a></li>
+                    <li class="nav-item"><a class="nav-link fw-medium" href="#" onclick="filterProducts('electronics')">Tech</a></li>
+                    <li class="nav-item"><a class="nav-link fw-medium" href="#" onclick="filterProducts('home')">Living</a></li>
+                    <li class="nav-item"><a class="nav-link fw-medium text-danger" href="#" onclick="filterProducts('sale')">Sale</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active"></button>
+            <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1"></button>
+        </div>
+        <div class="carousel-inner">
+            <div class="carousel-item active">
+                <img src="https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070&auto=format&fit=crop" class="d-block w-100" alt="Fashion">
+                <div class="carousel-caption d-none d-md-block hero-caption">
+                    <h5 class="text-uppercase letter-spacing-2 mb-2">Spring 2025</h5>
+                    <h1 class="hero-title mb-4">Elevate Your<br>Everyday Style</h1>
+                    <button class="btn btn-light rounded-pill px-5 py-3 fw-bold" onclick="filterProducts('fashion')">Explore Fashion</button>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img src="https://images.unsplash.com/photo-1550009158-9ebf69173e03?q=80&w=2001&auto=format&fit=crop" class="d-block w-100" alt="Tech">
+                <div class="carousel-caption d-none d-md-block hero-caption">
+                    <h5 class="text-uppercase letter-spacing-2 mb-2">Innovation</h5>
+                    <h1 class="hero-title mb-4">The Future<br>Is Now</h1>
+                    <button class="btn btn-light rounded-pill px-5 py-3 fw-bold" onclick="filterProducts('electronics')">Shop Tech</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container py-5">
+        
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mb-5 gap-3">
+            <div class="cat-scroll w-100 w-md-auto">
+                <button class="cat-btn active" onclick="filterProducts('all')" data-cat="all">All Items</button>
+                <button class="cat-btn" onclick="filterProducts('electronics')" data-cat="electronics">Electronics</button>
+                <button class="cat-btn" onclick="filterProducts('fashion')" data-cat="fashion">Fashion</button>
+                <button class="cat-btn" onclick="filterProducts('home')" data-cat="home">Home</button>
+                <button class="cat-btn" onclick="filterProducts('beauty')" data-cat="beauty">Beauty</button>
+                <button class="cat-btn" onclick="filterProducts('sports')" data-cat="sports">Sports</button>
+            </div>
+            
+            <select class="form-select w-auto rounded-pill border-secondary" onchange="sortProducts(this.value)">
+                <option value="default">Sort By: Featured</option>
+                <option value="low">Price: Low to High</option>
+                <option value="high">Price: High to Low</option>
+            </select>
+        </div>
+
+        <div class="row g-4" id="productGrid"></div>
+
+        <div class="text-center mt-5">
+            <button id="loadMoreBtn" class="btn btn-outline-dark rounded-pill px-5 py-2">Load More Products</button>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-white pt-5 pb-3">
+        <div class="container">
+            <div class="row g-4 mb-5">
+                <div class="col-lg-4">
+                    <h3 class="font-heading fw-bold mb-4">ShopVerse.</h3>
+                    <p class="text-secondary">Premium shopping experience curated for the modern lifestyle. Quality meets innovation.</p>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3">Shop</h6>
+                    <ul class="list-unstyled text-secondary small gap-2 d-grid">
+                        <li><a href="#" class="text-decoration-none text-secondary">New Arrivals</a></li>
+                        <li><a href="#" class="text-decoration-none text-secondary">Best Sellers</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-2 col-6">
+                    <h6 class="fw-bold mb-3">Support</h6>
+                    <ul class="list-unstyled text-secondary small gap-2 d-grid">
+                        <li><a href="#" class="text-decoration-none text-secondary">Order Status</a></li>
+                        <li><a href="#" class="text-decoration-none text-secondary">Returns</a></li>
+                    </ul>
+                </div>
+                <div class="col-lg-4">
+                    <h6 class="fw-bold mb-3">Stay Updated</h6>
+                    <div class="input-group">
+                        <input type="email" class="form-control bg-secondary bg-opacity-10 border-0 text-white" placeholder="Email address">
+                        <button class="btn btn-light">Join</button>
+                    </div>
+                </div>
+            </div>
+            <div class="border-top border-secondary pt-3 text-center text-secondary small">
+                &copy; 2025 ShopVerse Inc. All rights reserved.
+            </div>
+        </div>
+    </footer>
+
+    <div class="offcanvas offcanvas-end" tabindex="-1" id="cartOffcanvas">
+        <div class="offcanvas-header border-bottom">
+            <h5 class="offcanvas-title fw-bold font-heading">Shopping Cart</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body p-0" id="cartBody">
+            </div>
+        <div class="offcanvas-footer p-3 border-top bg-light">
+            <div class="d-flex justify-content-between mb-3">
+                <span class="fw-bold">Subtotal</span>
+                <span class="fw-bold fs-5" id="cartTotal">₹0</span>
+            </div>
+            <button class="btn btn-primary-custom w-100" onclick="initCheckout()">Checkout Now</button>
+        </div>
+    </div>
+
+    <div class="offcanvas offcanvas-start" tabindex="-1" id="mobileMenu">
+        <div class="offcanvas-header">
+            <h5 class="offcanvas-title fw-bold font-heading">Menu</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        </div>
+        <div class="offcanvas-body">
+            <div class="list-group list-group-flush">
+                <a href="#" class="list-group-item list-group-item-action py-3" onclick="filterProducts('all')" data-bs-dismiss="offcanvas">Home</a>
+                <a href="#" class="list-group-item list-group-item-action py-3" onclick="filterProducts('fashion')" data-bs-dismiss="offcanvas">Fashion</a>
+                <a href="#" class="list-group-item list-group-item-action py-3" onclick="filterProducts('electronics')" data-bs-dismiss="offcanvas">Electronics</a>
+                <a href="#" class="list-group-item list-group-item-action py-3" onclick="handleProfileClick()" data-bs-dismiss="offcanvas">My Profile</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="profileModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 overflow-hidden">
+                <div class="modal-body p-0">
+                    <div class="d-flex flex-column flex-md-row h-100">
+                        <div class="bg-light p-4" style="min-width: 240px; border-right: 1px solid #e2e8f0;">
+                            <div class="text-center mb-4">
+                                <div class="bg-white rounded-circle mx-auto mb-3 d-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px;">
+                                    <i class="bi bi-person-fill fs-1 text-secondary"></i>
+                                </div>
+                                <h6 class="fw-bold" id="profileNameDisplay">User Name</h6>
+                                <small class="text-muted" id="profileEmailDisplay">user@example.com</small>
+                            </div>
+                            <div class="nav flex-column nav-pills sidebar-menu" id="v-pills-tab">
+                                <button class="nav-link active" data-bs-toggle="pill" data-bs-target="#profile-tab">
+                                    <i class="bi bi-person-gear"></i> Profile Details
+                                </button>
+                                <button class="nav-link" data-bs-toggle="pill" data-bs-target="#orders-tab" onclick="renderOrderHistory()">
+                                    <i class="bi bi-bag-check"></i> Order History
+                                </button>
+                                <button class="nav-link text-danger mt-3" onclick="logout()">
+                                    <i class="bi bi-box-arrow-left"></i> Logout
+                                </button>
+                            </div>
+                        </div>
+                        <div class="p-4 flex-grow-1" style="max-height: 600px; overflow-y: auto;">
+                            <div class="tab-content">
+                                <div class="tab-pane fade show active" id="profile-tab">
+                                    <h4 class="font-heading fw-bold mb-4">Personal Information</h4>
+                                    <form id="profileForm">
+                                        <div class="row g-3">
+                                            <div class="col-md-6">
+                                                <label class="small text-muted mb-1">Full Name</label>
+                                                <input type="text" class="form-control" id="profName" required>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="small text-muted mb-1">Email</label>
+                                                <input type="email" class="form-control" id="profEmail" readonly disabled>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <label class="small text-muted mb-1">Phone</label>
+                                                <input type="tel" class="form-control" id="profPhone" placeholder="+91...">
+                                            </div>
+                                            <div class="col-12">
+                                                <label class="small text-muted mb-1">Shipping Address</label>
+                                                <textarea class="form-control" id="profAddress" rows="3" placeholder="Enter your full address for faster checkout"></textarea>
+                                            </div>
+                                            <div class="col-12 text-end mt-4">
+                                                <button type="submit" class="btn btn-primary-custom px-4">Save Changes</button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <div class="tab-pane fade" id="orders-tab">
+                                    <h4 class="font-heading fw-bold mb-4">My Orders</h4>
+                                    <div id="orderHistoryList"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="authModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 rounded-4 p-4 shadow-lg">
+                <div class="text-center mb-4">
+                    <h3 class="font-heading fw-bold">Welcome Back</h3>
+                    <p class="text-muted small">Login to access your account</p>
+                </div>
+                <ul class="nav nav-pills nav-fill mb-4 bg-light rounded-pill p-1">
+                    <li class="nav-item"><button class="nav-link active rounded-pill" data-bs-toggle="pill" data-bs-target="#login-panel">Login</button></li>
+                    <li class="nav-item"><button class="nav-link rounded-pill" data-bs-toggle="pill" data-bs-target="#signup-panel">Sign Up</button></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane fade show active" id="login-panel">
+                        <form id="loginForm">
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="loginEmail" placeholder="name@example.com" value="demo@user.com" required>
+                                <label>Email address</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" placeholder="Password" value="password" required>
+                                <label>Password</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2">Sign In</button>
+                        </form>
+                    </div>
+                    <div class="tab-pane fade" id="signup-panel">
+                        <form id="signupForm">
+                            <div class="form-floating mb-3">
+                                <input type="text" class="form-control" id="signupName" placeholder="Name" required>
+                                <label>Full Name</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="email" class="form-control" id="signupEmail" placeholder="name@example.com" required>
+                                <label>Email address</label>
+                            </div>
+                            <div class="form-floating mb-3">
+                                <input type="password" class="form-control" id="signupPass" placeholder="Password" required>
+                                <label>Password</label>
+                            </div>
+                            <button type="submit" class="btn btn-primary-custom w-100 py-2">Create Account</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="checkoutModal" tabindex="-1" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4">
+                <div class="modal-header border-bottom-0">
+                    <h5 class="modal-title font-heading fw-bold">Secure Checkout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="step-indicator">
+                        <div class="step active" id="step1-ind"><div class="step-circle">1</div><small>Shipping</small></div>
+                        <div class="step" id="step2-ind"><div class="step-circle">2</div><small>Payment</small></div>
+                        <div class="step" id="step3-ind"><div class="step-circle">3</div><small>Confirm</small></div>
+                    </div>
+
+                    <div id="checkout-step-1">
+                        <h6 class="fw-bold mb-3">Shipping Address</h6>
+                        <form onsubmit="event.preventDefault(); nextCheckoutStep(2);">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <input type="text" class="form-control" id="shipName" placeholder="Full Name" required>
+                                </div>
+                                <div class="col-12">
+                                    <input type="text" class="form-control" id="shipAddress" placeholder="Street Address" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" placeholder="City" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <input type="text" class="form-control" placeholder="Zip Code" required>
+                                </div>
+                                <div class="col-12 text-end mt-4">
+                                    <button type="submit" class="btn btn-primary-custom">Continue to Payment</button>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="checkout-step-2" style="display: none;">
+                        <h6 class="fw-bold mb-3">Payment Method</h6>
+                        <form onsubmit="event.preventDefault(); nextCheckoutStep(3);">
+                            <div class="card bg-light border-0 p-3 mb-3">
+                                <div class="d-flex justify-content-between mb-3">
+                                    <span class="fw-bold">Credit Card</span>
+                                    <span><i class="bi bi-credit-card-2-front"></i></span>
+                                </div>
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <input type="text" class="form-control" placeholder="Card Number" maxlength="16" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="text" class="form-control" placeholder="MM/YY" maxlength="5" required>
+                                    </div>
+                                    <div class="col-6">
+                                        <input type="password" class="form-control" placeholder="CVV" maxlength="3" required>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between mt-4">
+                                <button type="button" class="btn btn-outline-secondary rounded-pill" onclick="nextCheckoutStep(1)">Back</button>
+                                <button type="submit" class="btn btn-primary-custom">Review Order</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div id="checkout-step-3" style="display: none;">
+                        <h6 class="fw-bold mb-3">Order Summary</h6>
+                        <div class="bg-light p-3 rounded-3 mb-3">
+                            <div id="checkoutItemsList" class="mb-3 border-bottom pb-2"></div>
+                            <div class="d-flex justify-content-between fw-bold fs-5">
+                                <span>Total</span>
+                                <span class="text-primary" id="finalTotal">₹0</span>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between mt-4">
+                            <button type="button" class="btn btn-outline-secondary rounded-pill" onclick="nextCheckoutStep(2)">Back</button>
+                            <button type="button" class="btn btn-success rounded-pill px-4" id="payBtn" onclick="processPayment()">Pay & Place Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="searchModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow-lg">
+                <div class="modal-body p-4">
+                    <div class="input-group mb-3">
+                        <span class="input-group-text bg-white border-end-0"><i class="bi bi-search"></i></span>
+                        <input type="text" class="form-control border-start-0" id="searchInput" placeholder="Type to search...">
+                    </div>
+                    <div id="searchResults" class="list-group list-group-flush" style="max-height: 300px; overflow-y: auto;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="quickViewModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content border-0 rounded-4 overflow-hidden">
+                <div class="modal-body p-0">
+                    <button type="button" class="btn-close position-absolute top-0 end-0 m-3 z-3" data-bs-dismiss="modal"></button>
+                    <div id="quickViewContent"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // ================= 75 PRODUCTS DATABASE =================
+        const productsDB = [
+            // ELECTRONICS
+            { id: 1, name: "Sony WH-1000XM5", category: "electronics", price: 26990, oldPrice: 29990, rating: 4.9, image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=600&q=80", badge: "Best Seller" },
+            { id: 2, name: "MacBook Air M2", category: "electronics", price: 99900, oldPrice: 114900, rating: 4.8, image: "https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=600&q=80", badge: "Sale" },
+            { id: 3, name: "iPhone 15 Pro", category: "electronics", price: 134900, oldPrice: 139900, rating: 4.9, image: "https://images.unsplash.com/photo-1695048133142-1a20484d2569?w=600&q=80" },
+            { id: 4, name: "Canon EOS R6", category: "electronics", price: 215000, oldPrice: 230000, rating: 5.0, image: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=600&q=80" },
+            { id: 5, name: "Logitech MX Master 3S", category: "electronics", price: 9500, oldPrice: 10995, rating: 4.7, image: "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=600&q=80" },
+            { id: 6, name: "Apple Watch Series 9", category: "electronics", price: 41900, oldPrice: 45000, rating: 4.6, image: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=600&q=80" },
+            { id: 7, name: "iPad Air 5", category: "electronics", price: 54900, oldPrice: 59900, rating: 4.8, image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=600&q=80" },
+            { id: 8, name: "JBL Flip 6", category: "electronics", price: 9999, oldPrice: 13999, rating: 4.5, image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=600&q=80" },
+            { id: 9, name: "PlayStation 5", category: "electronics", price: 49990, oldPrice: 54990, rating: 4.9, image: "https://images.unsplash.com/photo-1606144042614-b2417e99c4e3?w=600&q=80", badge: "Hot" },
+            { id: 10, name: "Mechanical Keyboard", category: "electronics", price: 4500, oldPrice: 6000, rating: 4.4, image: "https://images.unsplash.com/photo-1595225476474-87563907a212?w=600&q=80" },
+            { id: 11, name: "Samsung Galaxy S24", category: "electronics", price: 79999, oldPrice: 89999, rating: 4.7, image: "https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=600&q=80" },
+            { id: 12, name: "GoPro Hero 11", category: "electronics", price: 35000, oldPrice: 45000, rating: 4.6, image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=600&q=80" },
+            { id: 13, name: "Drone DJI Mini", category: "electronics", price: 45000, oldPrice: 55000, rating: 4.8, image: "https://images.unsplash.com/photo-1579829366248-204fe8413f31?w=600&q=80" },
+            { id: 14, name: "Gaming Mouse", category: "electronics", price: 2999, oldPrice: 4999, rating: 4.3, image: "https://images.unsplash.com/photo-1527814050087-3793815479db?w=600&q=80" },
+            { id: 15, name: "VR Headset", category: "electronics", price: 29999, oldPrice: 35000, rating: 4.5, image: "https://images.unsplash.com/photo-1622979135225-d2ba269fb1bd?w=600&q=80" },
+            // FASHION
+            { id: 16, name: "Nike Air Jordan", category: "fashion", price: 12995, oldPrice: 15995, rating: 4.9, image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&q=80", badge: "Trending" },
+            { id: 17, name: "Levi's Denim Jacket", category: "fashion", price: 3499, oldPrice: 5999, rating: 4.5, image: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&q=80" },
+            { id: 18, name: "Ray-Ban Aviator", category: "fashion", price: 8500, oldPrice: 10500, rating: 4.7, image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=600&q=80" },
+            { id: 19, name: "Classic Trench Coat", category: "fashion", price: 6500, oldPrice: 9000, rating: 4.6, image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80" },
+            { id: 20, name: "Leather Tote Bag", category: "fashion", price: 4200, oldPrice: 6500, rating: 4.4, image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=600&q=80" },
+            { id: 21, name: "Casio Vintage Watch", category: "fashion", price: 1695, oldPrice: 2995, rating: 4.3, image: "https://images.unsplash.com/photo-1524592094714-0f0654e20314?w=600&q=80" },
+            { id: 22, name: "Summer Floral Dress", category: "fashion", price: 2100, oldPrice: 3200, rating: 4.5, image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=600&q=80" },
+            { id: 23, name: "Men's Slim Fit Suit", category: "fashion", price: 8999, oldPrice: 12000, rating: 4.6, image: "https://images.unsplash.com/photo-1594938298603-c8148c472997?w=600&q=80" },
+            { id: 24, name: "Running Sneakers", category: "fashion", price: 4500, oldPrice: 6000, rating: 4.5, image: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&q=80" },
+            { id: 25, name: "Silk Scarf", category: "fashion", price: 999, oldPrice: 1500, rating: 4.2, image: "https://images.unsplash.com/photo-1584030373081-f37b7bb4faae?w=600&q=80" },
+            { id: 26, name: "Wool Sweater", category: "fashion", price: 2500, oldPrice: 3500, rating: 4.5, image: "https://images.unsplash.com/photo-1620799140408-ed5341cd2431?w=600&q=80" },
+            { id: 27, name: "Fedora Hat", category: "fashion", price: 1200, oldPrice: 1800, rating: 4.3, image: "https://images.unsplash.com/photo-1514327605112-b887c0e61c0a?w=600&q=80" },
+            { id: 28, name: "Chelsea Boots", category: "fashion", price: 3800, oldPrice: 5000, rating: 4.7, image: "https://images.unsplash.com/photo-1638247025967-b4e38f787b76?w=600&q=80" },
+            { id: 29, name: "Bomber Jacket", category: "fashion", price: 3200, oldPrice: 4500, rating: 4.6, image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&q=80" },
+            { id: 30, name: "Yoga Leggings", category: "fashion", price: 1500, oldPrice: 2200, rating: 4.5, image: "https://images.unsplash.com/photo-1506619216599-9d16d0903dfd?w=600&q=80" },
+            // HOME
+            { id: 31, name: "Minimalist Lamp", category: "home", price: 1800, oldPrice: 2500, rating: 4.6, image: "https://images.unsplash.com/photo-1507473888900-52e1adad5481?w=600&q=80" },
+            { id: 32, name: "Velvet Armchair", category: "home", price: 12500, oldPrice: 18000, rating: 4.8, image: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=600&q=80", badge: "Sale" },
+            { id: 33, name: "Ceramic Plant Pot", category: "home", price: 850, oldPrice: 1200, rating: 4.7, image: "https://images.unsplash.com/photo-1485955900006-10f4d324d411?w=600&q=80" },
+            { id: 34, name: "Coffee Maker", category: "home", price: 4500, oldPrice: 6000, rating: 4.5, image: "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=600&q=80" },
+            { id: 35, name: "Cotton Bed Sheets", category: "home", price: 1500, oldPrice: 2200, rating: 4.4, image: "https://images.unsplash.com/photo-1522771753035-4a53c9f1643b?w=600&q=80" },
+            { id: 36, name: "Aroma Diffuser", category: "home", price: 1200, oldPrice: 1800, rating: 4.5, image: "https://images.unsplash.com/photo-1608514931264-b5296cb24a64?w=600&q=80" },
+            { id: 37, name: "Wooden Wall Clock", category: "home", price: 2200, oldPrice: 3000, rating: 4.3, image: "https://images.unsplash.com/photo-1563861826100-9cb868c62138?w=600&q=80" },
+            { id: 38, name: "Modern Vase", category: "home", price: 950, oldPrice: 1500, rating: 4.6, image: "https://images.unsplash.com/photo-1581783345124-747849e67171?w=600&q=80" },
+            { id: 39, name: "Scented Candles", category: "home", price: 650, oldPrice: 999, rating: 4.8, image: "https://images.unsplash.com/photo-1602826647249-1663a03c39c8?w=600&q=80" },
+            { id: 40, name: "Kitchen Knife Set", category: "home", price: 3500, oldPrice: 5000, rating: 4.7, image: "https://images.unsplash.com/photo-1593618998160-e34014e67546?w=600&q=80" },
+            // BEAUTY
+            { id: 46, name: "Luxury Perfume", category: "beauty", price: 4500, oldPrice: 6500, rating: 4.8, image: "https://images.unsplash.com/photo-1541643600914-78b084683601?w=600&q=80", badge: "Premium" },
+            { id: 47, name: "Hydrating Serum", category: "beauty", price: 899, oldPrice: 1299, rating: 4.7, image: "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=600&q=80" },
+            { id: 48, name: "Matte Lipstick", category: "beauty", price: 1499, oldPrice: 1999, rating: 4.5, image: "https://images.unsplash.com/photo-1586495777744-4413f21062fa?w=600&q=80" },
+            { id: 49, name: "Organic Face Wash", category: "beauty", price: 399, oldPrice: 599, rating: 4.4, image: "https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&q=80" },
+            { id: 50, name: "Hair Care Kit", category: "beauty", price: 2100, oldPrice: 2800, rating: 4.6, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=600&q=80" },
+            { id: 51, name: "Makeup Brushes", category: "beauty", price: 999, oldPrice: 1500, rating: 4.5, image: "https://images.unsplash.com/photo-1596462502278-27bfdd403348?w=600&q=80" },
+            { id: 52, name: "Sunscreen SPF 50", category: "beauty", price: 550, oldPrice: 750, rating: 4.8, image: "https://images.unsplash.com/photo-1526947425960-945c6e72858f?w=600&q=80" },
+            { id: 53, name: "Body Lotion", category: "beauty", price: 450, oldPrice: 600, rating: 4.3, image: "https://images.unsplash.com/photo-1608248597279-f99d160bfbc8?w=600&q=80" },
+            { id: 54, name: "Face Mask Sheet", category: "beauty", price: 100, oldPrice: 200, rating: 4.6, image: "https://images.unsplash.com/photo-1596704017254-9b121068fb31?w=600&q=80" },
+            { id: 55, name: "Grooming Kit", category: "beauty", price: 1800, oldPrice: 2500, rating: 4.5, image: "https://images.unsplash.com/photo-1621600411688-4be93cd68504?w=600&q=80" },
+            // SPORTS
+            { id: 61, name: "Yoga Mat", category: "sports", price: 800, oldPrice: 1200, rating: 4.7, image: "https://images.unsplash.com/photo-1601925260368-ae2f83cf8b7f?w=600&q=80" },
+            { id: 62, name: "Dumbbell Set", category: "sports", price: 2500, oldPrice: 3500, rating: 4.8, image: "https://images.unsplash.com/photo-1638536532686-d610adfc8e5c?w=600&q=80" },
+            { id: 63, name: "Running Shoes", category: "sports", price: 3200, oldPrice: 4500, rating: 4.6, image: "https://images.unsplash.com/photo-1595341888016-a392ef81b7de?w=600&q=80" },
+            { id: 64, name: "Tennis Racket", category: "sports", price: 4200, oldPrice: 5500, rating: 4.7, image: "https://images.unsplash.com/photo-1622279457486-62dcc4a431d6?w=600&q=80" },
+            { id: 65, name: "Basketball", category: "sports", price: 1200, oldPrice: 1800, rating: 4.8, image: "https://images.unsplash.com/photo-1519861531473-9200262188bf?w=600&q=80" },
+            { id: 66, name: "Resistance Bands", category: "sports", price: 500, oldPrice: 900, rating: 4.5, image: "https://images.unsplash.com/photo-1598289431512-b97b0917affc?w=600&q=80" },
+            { id: 67, name: "Gym Bag", category: "sports", price: 1500, oldPrice: 2200, rating: 4.6, image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=600&q=80" },
+            { id: 68, name: "Cycling Helmet", category: "sports", price: 1800, oldPrice: 2500, rating: 4.7, image: "https://images.unsplash.com/photo-1557803175-2140e6981886?w=600&q=80" },
+            { id: 69, name: "Water Bottle", category: "sports", price: 600, oldPrice: 900, rating: 4.4, image: "https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=600&q=80" },
+            { id: 70, name: "Swimming Goggles", category: "sports", price: 800, oldPrice: 1200, rating: 4.5, image: "https://images.unsplash.com/photo-1579805367616-a53d623397d9?w=600&q=80" }
+        ];
+
+        // ================= STATE =================
+        let state = {
+            products: productsDB,
+            filtered: productsDB,
+            visible: 12,
+            cart: JSON.parse(localStorage.getItem('sv_cart')) || [],
+            user: JSON.parse(localStorage.getItem('sv_user')) || null,
+            orders: JSON.parse(localStorage.getItem('sv_orders')) || [],
+            wishlist: JSON.parse(localStorage.getItem('sv_wishlist')) || []
+        };
+
+        // ================= INITIALIZATION =================
+        document.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            updateCartUI();
+            checkSession();
+            setupSearch();
+        });
+
+        // ================= RENDER PRODUCTS =================
+        function renderProducts() {
+            const grid = document.getElementById('productGrid');
+            const items = state.filtered.slice(0, state.visible);
+            
+            grid.innerHTML = items.map(p => `
+                <div class="col-6 col-md-4 col-lg-3">
+                    <div class="product-card" onclick="openQuickView(${p.id})">
+                        <div class="card-img-wrapper">
+                            <img src="${p.image}" loading="lazy" alt="${p.name}">
+                            ${p.badge ? `<span class="badge bg-danger position-absolute top-0 start-0 m-3">${p.badge}</span>` : ''}
+                            <div class="card-actions" onclick="event.stopPropagation()">
+                                <div class="action-btn ${state.wishlist.includes(p.id) ? 'active' : ''}" onclick="toggleWishlist(${p.id}, this)">
+                                    <i class="bi bi-heart-fill"></i>
+                                </div>
+                                <div class="action-btn" onclick="addToCart(${p.id})">
+                                    <i class="bi bi-bag-plus-fill"></i>
+                                </div>
+                                <div class="action-btn" onclick="openQuickView(${p.id})">
+                                    <i class="bi bi-eye-fill"></i>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-3">
+                            <small class="text-uppercase text-muted fw-bold" style="font-size: 0.7rem">${p.category}</small>
+                            <h6 class="fw-bold mb-1 text-truncate">${p.name}</h6>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="fw-bold">₹${p.price.toLocaleString()}</span>
+                                    <small class="text-muted text-decoration-line-through ms-1">₹${p.oldPrice}</small>
+                                </div>
+                                <small class="text-warning"><i class="bi bi-star-fill"></i> ${p.rating}</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+
+            const loadBtn = document.getElementById('loadMoreBtn');
+            loadBtn.style.display = state.visible >= state.filtered.length ? 'none' : 'block';
+        }
+
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            state.visible += 12;
+            renderProducts();
+        });
+
+        // ================= ACTIONS =================
+        function filterProducts(cat) {
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            document.querySelector(`.cat-btn[data-cat="${cat}"]`)?.classList.add('active');
+            
+            state.filtered = cat === 'all' ? state.products : state.products.filter(p => p.category === cat);
+            state.visible = 12;
+            renderProducts();
+        }
+
+        function sortProducts(type) {
+            if (type === 'low') state.filtered.sort((a,b) => a.price - b.price);
+            if (type === 'high') state.filtered.sort((a,b) => b.price - a.price);
+            renderProducts();
+        }
+
+        function toggleWishlist(id, btn) {
+            const idx = state.wishlist.indexOf(id);
+            if (idx > -1) {
+                state.wishlist.splice(idx, 1);
+                if(btn) btn.classList.remove('active');
+                showToast('Removed', 'Removed from Wishlist', 'info');
+            } else {
+                state.wishlist.push(id);
+                if(btn) btn.classList.add('active');
+                showToast('Saved', 'Added to Wishlist', 'success');
+            }
+            localStorage.setItem('sv_wishlist', JSON.stringify(state.wishlist));
+        }
+
+        // ================= CART =================
+        function addToCart(id) {
+            const item = state.cart.find(i => i.id === id);
+            if (item) item.qty++;
+            else state.cart.push({ id, qty: 1 });
+            saveState();
+            updateCartUI();
+            showToast('Added', 'Item added to cart', 'success');
+        }
+
+        function updateCartUI() {
+            document.getElementById('cartCount').textContent = state.cart.reduce((a,b) => a + b.qty, 0);
+            const tbody = document.getElementById('cartBody');
+            
+            if (state.cart.length === 0) {
+                tbody.innerHTML = '<div class="text-center py-5 text-muted">Your cart is empty</div>';
+                document.getElementById('cartTotal').textContent = '₹0';
+                return;
+            }
+
+            let total = 0;
+            tbody.innerHTML = state.cart.map(item => {
+                const p = state.products.find(x => x.id === item.id);
+                total += p.price * item.qty;
+                return `
+                <div class="d-flex align-items-center p-3 border-bottom">
+                    <img src="${p.image}" style="width: 60px; height: 60px; object-fit: cover; border-radius: 8px;">
+                    <div class="ms-3 flex-grow-1">
+                        <h6 class="mb-0 fw-bold small">${p.name}</h6>
+                        <small class="text-muted">₹${p.price.toLocaleString()}</small>
+                    </div>
+                    <div class="d-flex align-items-center gap-2">
+                        <button class="btn btn-sm btn-light border" onclick="modQty(${item.id}, -1)">-</button>
+                        <span class="small fw-bold">${item.qty}</span>
+                        <button class="btn btn-sm btn-light border" onclick="modQty(${item.id}, 1)">+</button>
+                    </div>
+                </div>`;
+            }).join('');
+            document.getElementById('cartTotal').textContent = '₹' + total.toLocaleString();
+        }
+
+        function modQty(id, change) {
+            const item = state.cart.find(i => i.id === id);
+            item.qty += change;
+            if (item.qty <= 0) state.cart = state.cart.filter(i => i.id !== id);
+            saveState();
+            updateCartUI();
+        }
+
+        // ================= USER & PROFILE =================
+        function handleProfileClick() {
+            if (state.user) {
+                // Populate Profile Data
+                document.getElementById('profileNameDisplay').innerText = state.user.name;
+                document.getElementById('profileEmailDisplay').innerText = state.user.email;
+                document.getElementById('profName').value = state.user.name;
+                document.getElementById('profEmail').value = state.user.email;
+                document.getElementById('profPhone').value = state.user.phone || '';
+                document.getElementById('profAddress').value = state.user.address || '';
+                
+                new bootstrap.Modal('#profileModal').show();
+            } else {
+                new bootstrap.Modal('#authModal').show();
+            }
+        }
+
+        function checkSession() {
+            const btn = document.getElementById('profileBtn');
+            if (state.user) {
+                btn.classList.add('bg-dark', 'text-white', 'border-dark');
+                btn.innerHTML = '<i class="bi bi-person-fill"></i>';
+            } else {
+                btn.classList.remove('bg-dark', 'text-white', 'border-dark');
+                btn.innerHTML = '<i class="bi bi-person"></i>';
+            }
+        }
+
+        document.getElementById('loginForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            // Simulated Login
+            state.user = { name: "Demo User", email: email };
+            saveState();
+            checkSession();
+            bootstrap.Modal.getInstance('#authModal').hide();
+            showToast('Welcome', 'Logged in successfully', 'success');
+        });
+
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            state.user = { name, email };
+            saveState();
+            checkSession();
+            bootstrap.Modal.getInstance('#authModal').hide();
+            showToast('Welcome', 'Account created!', 'success');
+        });
+
+        // Save Profile Edits
+        document.getElementById('profileForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            state.user.name = document.getElementById('profName').value;
+            state.user.phone = document.getElementById('profPhone').value;
+            state.user.address = document.getElementById('profAddress').value;
+            document.getElementById('profileNameDisplay').innerText = state.user.name;
+            saveState();
+            showToast('Saved', 'Profile updated successfully', 'success');
+        });
+
+        function logout() {
+            state.user = null;
+            saveState();
+            checkSession();
+            bootstrap.Modal.getInstance('#profileModal').hide();
+            showToast('Logout', 'See you soon!', 'info');
+        }
+
+        // ================= ORDERS =================
+        function renderOrderHistory() {
+            const container = document.getElementById('orderHistoryList');
+            if (state.orders.length === 0) {
+                container.innerHTML = '<div class="text-center py-5 text-muted">No past orders found.</div>';
+                return;
+            }
+
+            container.innerHTML = state.orders.map(order => {
+                const itemsHtml = order.items.map(i => {
+                    const p = state.products.find(x => x.id === i.id);
+                    return `<img src="${p.image}" class="order-thumb me-2" title="${p.name} x${i.qty}">`;
+                }).join('');
+
+                return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <span class="fw-bold d-block">Order #${order.id}</span>
+                            <small class="text-muted">${order.date}</small>
+                        </div>
+                        <div class="text-end">
+                            <span class="fw-bold d-block">₹${order.total.toLocaleString()}</span>
+                            <span class="badge bg-success bg-opacity-10 text-success">Completed</span>
+                        </div>
+                    </div>
+                    <div class="order-items-scroll">
+                        ${itemsHtml}
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        // ================= CHECKOUT FLOW =================
+        function initCheckout() {
+            if (!state.user) {
+                bootstrap.Offcanvas.getInstance('#cartOffcanvas').hide();
+                new bootstrap.Modal('#authModal').show();
+                return;
+            }
+            if (state.cart.length === 0) return;
+
+            // Pre-fill
+            document.getElementById('shipName').value = state.user.name || '';
+            document.getElementById('shipAddress').value = state.user.address || '';
+
+            bootstrap.Offcanvas.getInstance('#cartOffcanvas').hide();
+            new bootstrap.Modal('#checkoutModal').show();
+            nextCheckoutStep(1);
+        }
+
+        function nextCheckoutStep(step) {
+            for(let i=1; i<=3; i++) {
+                document.getElementById(`checkout-step-${i}`).style.display = 'none';
+                document.getElementById(`step${i}-ind`).classList.remove('active', 'completed');
+            }
+            document.getElementById(`checkout-step-${step}`).style.display = 'block';
+            document.getElementById(`step${step}-ind`).classList.add('active');
+            for(let i=1; i<step; i++) document.getElementById(`step${i}-ind`).classList.add('completed');
+
+            // Render summary on Step 3
+            if (step === 3) {
+                let total = 0;
+                const html = state.cart.map(item => {
+                    const p = state.products.find(x => x.id === item.id);
+                    total += p.price * item.qty;
+                    return `<div class="d-flex justify-content-between small mb-2">
+                        <span>${item.qty}x ${p.name}</span>
+                        <span>₹${(p.price * item.qty).toLocaleString()}</span>
+                    </div>`;
+                }).join('');
+                document.getElementById('checkoutItemsList').innerHTML = html;
+                document.getElementById('finalTotal').innerText = '₹' + total.toLocaleString();
+            }
+        }
+
+        function processPayment() {
+            const btn = document.getElementById('payBtn');
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Processing...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                const total = state.cart.reduce((acc, i) => acc + (state.products.find(p=>p.id===i.id).price * i.qty), 0);
+                
+                const newOrder = {
+                    id: Math.floor(Math.random() * 1000000),
+                    date: new Date().toLocaleDateString(),
+                    total: total,
+                    items: [...state.cart]
+                };
+
+                state.orders.unshift(newOrder);
+                state.cart = [];
+                localStorage.setItem('sv_orders', JSON.stringify(state.orders));
+                saveState();
+                updateCartUI();
+
+                bootstrap.Modal.getInstance('#checkoutModal').hide();
+                showToast('Order Placed', `Order #${newOrder.id} confirmed!`, 'success');
+                
+                btn.innerHTML = 'Pay & Place Order';
+                btn.disabled = false;
+            }, 2000);
+        }
+
+        // ================= UTILS =================
+        function openQuickView(id) {
+            const p = state.products.find(x => x.id === id);
+            const html = `
+                <div class="row g-0">
+                    <div class="col-md-6">
+                        <img src="${p.image}" class="w-100 h-100 object-fit-cover" style="min-height:350px;">
+                    </div>
+                    <div class="col-md-6 p-4 d-flex flex-column justify-content-center">
+                        <div class="text-uppercase text-muted fw-bold small mb-2">${p.category}</div>
+                        <h3 class="fw-bold">${p.name}</h3>
+                        <div class="d-flex align-items-center gap-2 mb-3">
+                            <span class="badge bg-warning text-dark"><i class="bi bi-star-fill"></i> ${p.rating}</span>
+                            <span class="text-muted text-decoration-line-through">₹${p.oldPrice}</span>
+                            <span class="fs-4 fw-bold text-primary">₹${p.price.toLocaleString()}</span>
+                        </div>
+                        <p class="text-muted">Premium quality product selected just for you. Features durable materials, modern design, and 1-year warranty.</p>
+                        <button class="btn btn-primary-custom w-100 mt-3" onclick="addToCart(${p.id}); bootstrap.Modal.getInstance('#quickViewModal').hide()">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+            document.getElementById('quickViewContent').innerHTML = html;
+            new bootstrap.Modal('#quickViewModal').show();
+        }
+
+        function saveState() {
+            localStorage.setItem('sv_cart', JSON.stringify(state.cart));
+            localStorage.setItem('sv_user', JSON.stringify(state.user));
+        }
+
+        function showToast(title, msg, type) {
+            const bgClass = type === 'success' ? 'bg-success' : type === 'error' ? 'bg-danger' : 'bg-primary';
+            const toastHtml = `
+                <div class="toast show align-items-center text-white ${bgClass} border-0 mb-2 shadow-lg" role="alert">
+                    <div class="d-flex">
+                        <div class="toast-body"><strong>${title}:</strong> ${msg}</div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast"></button>
+                    </div>
+                </div>`;
+            document.querySelector('.toast-container').insertAdjacentHTML('beforeend', toastHtml);
+            // Auto remove handled by CSS animation or timeout if needed, simple logic here:
+            setTimeout(() => { document.querySelector('.toast.show')?.remove(); }, 3500);
+        }
+
+        function setupSearch() {
+            document.getElementById('searchInput').addEventListener('input', (e) => {
+                const val = e.target.value.toLowerCase();
+                const res = document.getElementById('searchResults');
+                if (val.length < 2) { res.innerHTML = ''; return; }
+                
+                const matches = state.products.filter(p => p.name.toLowerCase().includes(val));
+                res.innerHTML = matches.map(p => `
+                    <a href="#" class="list-group-item list-group-item-action d-flex align-items-center gap-2" onclick="openQuickView(${p.id})">
+                        <img src="${p.image}" width="40" height="40" class="rounded">
+                        <div>
+                            <div class="fw-bold small">${p.name}</div>
+                            <div class="text-muted small">₹${p.price}</div>
+                        </div>
+                    </a>
+                `).join('');
+            });
+        }
+    </script>
+</body>
+</html>
